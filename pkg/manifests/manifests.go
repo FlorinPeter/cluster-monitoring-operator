@@ -287,6 +287,12 @@ func (f *Factory) AlertmanagerMain(host string) (*monv1.Alertmanager, error) {
 	}
 
 	for c := range a.Spec.Containers {
+		for pos, arg := range a.Spec.Containers[c].Args {
+			if strings.HasPrefix(arg,"-openshift-sar") || strings.HasPrefix(arg,"-openshift-delegate-urls") {
+				a.Spec.Containers[c].Args[pos] = strings.Replace(arg, "openshift-monitoring", f.namespace, 1)
+			}
+		}
+
 		for e := range a.Spec.Containers[c].Env {
 			switch a.Spec.Containers[c].Env[e].Name {
 			case "HTTP_PROXY":
@@ -792,6 +798,12 @@ func (f *Factory) PrometheusK8s(host string) (*monv1.Prometheus, error) {
 		p.Spec.AdditionalScrapeConfigs = f.config.PrometheusK8sConfig.AdditionalScrapeConfigs
 	}
 
+	for pos, arg := range p.Spec.Containers[0].Args {
+		if strings.HasPrefix(arg,"-openshift-sar") || strings.HasPrefix(arg,"-openshift-delegate-urls") {
+			p.Spec.Containers[0].Args[pos] = strings.Replace(arg, "openshift-monitoring", f.namespace, 1)
+		}
+	}
+
 	return p, nil
 }
 
@@ -1142,6 +1154,12 @@ func (f *Factory) GrafanaDeployment() (*appsv1.Deployment, error) {
 
 	if f.config.GrafanaConfig.NodeSelector != nil {
 		d.Spec.Template.Spec.NodeSelector = f.config.GrafanaConfig.NodeSelector
+	}
+
+	for pos, arg := range d.Spec.Template.Spec.Containers[1].Args {
+		if strings.HasPrefix(arg,"-openshift-sar") || strings.HasPrefix(arg,"-openshift-delegate-urls") {
+			d.Spec.Template.Spec.Containers[1].Args[pos] = strings.Replace(arg, "openshift-monitoring", f.namespace, 1)
+		}
 	}
 
 	d.Namespace = f.namespace
