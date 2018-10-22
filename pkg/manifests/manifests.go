@@ -1042,6 +1042,8 @@ func (f *Factory) GrafanaDatasources() (*v1.Secret, error) {
 		return nil, err
 	}
 
+	d.Datasources[0].Url = strings.Replace(d.Datasources[0].Url, "openshift-monitoring", f.namespace, 1)
+
 	b, err := json.MarshalIndent(d, "", "    ")
 	if err != nil {
 		return nil, err
@@ -1154,6 +1156,25 @@ func (f *Factory) GrafanaDeployment() (*appsv1.Deployment, error) {
 
 	if f.config.GrafanaConfig.NodeSelector != nil {
 		d.Spec.Template.Spec.NodeSelector = f.config.GrafanaConfig.NodeSelector
+	}
+
+	if f.config.GrafanaConfig.PersistentVolumeClaim != nil {
+		for pos, v := range d.Spec.Template.Spec.Volumes {
+			if v.Name == "grafana-storage" {
+				v.PersistentVolumeClaim = f.config.GrafanaConfig.PersistentVolumeClaim
+				v.EmptyDir = nil
+				d.Spec.Template.Spec.Volumes[pos] = v
+				break
+			}
+		}
+
+		d.Spec.Strategy.Type = "Recreate"
+	}
+
+	if f.config.GrafanaConfig.AdminUser != "" {
+		envs := []v1.EnvVar{}
+		envs = append(envs, v1.EnvVar{Name: "GF_SECURITY_ADMIN_USER", Value: f.config.GrafanaConfig.AdminUser})
+		d.Spec.Template.Spec.Containers[0].Env = envs
 	}
 
 	for pos, arg := range d.Spec.Template.Spec.Containers[1].Args {

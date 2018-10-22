@@ -76,10 +76,12 @@ type AlertmanagerMainConfig struct {
 }
 
 type GrafanaConfig struct {
-	BaseImage    string            `json:"baseImage"`
-	Tag          string            `json:"-"`
-	NodeSelector map[string]string `json:"nodeSelector"`
-	Hostport     string            `json:"hostport"`
+	BaseImage                 string                                `json:"baseImage"`
+	Tag                       string                                `json:"-"`
+	NodeSelector              map[string]string                     `json:"nodeSelector"`
+	Hostport                  string                                `json:"hostport"`
+	PersistentVolumeClaim     *v1.PersistentVolumeClaimVolumeSource `json:"persistentVolumeClaim"`
+	AdminUser                 string                                `json:"adminUser"`
 }
 
 type AuthConfig struct {
