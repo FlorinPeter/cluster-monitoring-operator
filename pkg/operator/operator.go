@@ -240,8 +240,8 @@ func (o *Operator) sync(key string) error {
 			tasks.NewTaskSpec("Updating Grafana", tasks.NewGrafanaTask(o.client, factory)),
 			tasks.NewTaskSpec("Updating Prometheus-k8s", tasks.NewPrometheusTask(o.client, factory, config)),
 			tasks.NewTaskSpec("Updating Alertmanager", tasks.NewAlertmanagerTask(o.client, factory)),
-			tasks.NewTaskSpec("Updating node-exporter", tasks.NewNodeExporterTask(o.client, factory)),
-			tasks.NewTaskSpec("Updating kube-state-metrics", tasks.NewKubeStateMetricsTask(o.client, factory)),
+			tasks.NewTaskSpec("Updating node-exporter", tasks.NewNodeExporterTask(o.client, factory, config.NodeExporterConfig)),
+			tasks.NewTaskSpec("Updating kube-state-metrics", tasks.NewKubeStateMetricsTask(o.client, factory, config.KubeStateMetricsConfig)),
 		},
 	)
 
