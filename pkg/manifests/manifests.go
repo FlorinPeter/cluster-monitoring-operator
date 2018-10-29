@@ -300,6 +300,7 @@ func (f *Factory) AlertmanagerMain(host string) (*monv1.Alertmanager, error) {
 		}
 	}
 
+	a.Spec.Affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution[0].PodAffinityTerm.Namespaces = []string{f.namespace}
 	a.Namespace = f.namespace
 
 	return a, nil
@@ -840,6 +841,8 @@ func (f *Factory) PrometheusK8s(host string) (*monv1.Prometheus, error) {
 			p.Spec.Containers[0].Args[pos] = strings.Replace(arg, "openshift-monitoring", f.namespace, 1)
 		}
 	}
+
+	p.Spec.Affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution[0].PodAffinityTerm.Namespaces = []string{f.namespace}
 
 	return p, nil
 }
