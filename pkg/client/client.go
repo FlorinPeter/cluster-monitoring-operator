@@ -279,10 +279,10 @@ func (c *Client) DeletePrometheusRule(sm *monv1.PrometheusRule) error {
 	return nil
 }
 
-func (c *Client) DeleteServiceMonitor(namespace, name string) error {
-	sclient := c.mclient.MonitoringV1().ServiceMonitors(namespace)
+func (c *Client) DeleteServiceMonitor(sm *monv1.ServiceMonitor) error {
+	sclient := c.mclient.MonitoringV1().ServiceMonitors(sm.Namespace)
 
-	err := sclient.Delete(name, nil)
+	err := sclient.Delete(sm.GetName(), nil)
 	// if the object does not exist then everything is good here
 	if err != nil && !apierrors.IsNotFound(err) {
 		return errors.Wrap(err, "deleting ServiceMonitor object failed")
